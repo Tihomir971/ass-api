@@ -1,6 +1,9 @@
 name = "ass-api"
 main = "src/index.ts"
 compatibility_date = "2023-12-18"
+compatibility_flags = [ "nodejs_compat" ]
+
+browser = { binding = "MYBROWSER" }
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
