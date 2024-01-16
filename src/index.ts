@@ -19,32 +19,38 @@ export default {
 			source = body.source;
 			const barcode = body.barcode;
 			let href = 'Undefined';
-
+			let browser;
 			if (source && barcode) {
-				const browser = await puppeteer.launch(env.MYBROWSER);
-				const page = await browser.newPage();
-				await page.goto('https://cenoteka.rs/');
-				// Wait for suggest overlay to appear and click "show all results".
-				const homeSearchSelector = '.nav_search_input__CB_KM';
-				await page.waitForSelector(homeSearchSelector);
-				await page.click(homeSearchSelector);
-				// Wait for the results page to load and display the results.
-				const innerSearchSelector = '#nav-search';
-				await page.waitForSelector(innerSearchSelector);
-				await page.type(innerSearchSelector, barcode);
-				// This code waits for a specific webpage element to load within 5 seconds, then retrieves and stores its URL.
-				const searchResultSelector =
-					'#__next > div > form > div.search_search_content_wrap__Ab4ZA.container > div.row.pt-4.pb-1 > div > div > a';
-				await page.waitForSelector(searchResultSelector, { timeout: 5000 });
-				href = await page.$eval(searchResultSelector, (elm) => elm.href);
-				await browser?.close();
-				/* const href = await vendorPrice.cenoteka(barcode); */
-				// Create a new object with the barcode
-				const responseBody = { path: href, source: source };
-				// Convert the object to a JSON string
-				const responseJson = JSON.stringify(responseBody);
-				// Return the JSON string as the response
-				return new Response(responseJson, { status: 200, headers: { 'Content-Type': 'application/json' } });
+				try {
+					browser = await puppeteer.launch(env.MYBROWSER);
+					const page = await browser.newPage();
+					await page.goto('https://cenoteka.rs/');
+					// Wait for suggest overlay to appear and click "show all results".
+					const homeSearchSelector = '.nav_search_input__CB_KM';
+					await page.waitForSelector(homeSearchSelector);
+					await page.click(homeSearchSelector);
+					// Wait for the results page to load and display the results.
+					const innerSearchSelector = '#nav-search';
+					await page.waitForSelector(innerSearchSelector);
+					await page.type(innerSearchSelector, barcode);
+					// This code waits for a specific webpage element to load within 5 seconds, then retrieves and stores its URL.
+					const searchResultSelector =
+						'#__next > div > form > div.search_search_content_wrap__Ab4ZA.container > div.row.pt-4.pb-1 > div > div > a';
+					await page.waitForSelector(searchResultSelector, { timeout: 5000 });
+					href = await page.$eval(searchResultSelector, (elm) => elm.href);
+
+					/* const href = await vendorPrice.cenoteka(barcode); */
+					// Create a new object with the barcode
+					const responseBody = { path: href, source: source };
+					// Convert the object to a JSON string
+					const responseJson = JSON.stringify(responseBody);
+					// Return the JSON string as the response
+					return new Response(responseJson, { status: 200, headers: { 'Content-Type': 'application/json' } });
+				} catch (error) {
+					return new Response("Can't find", { status: 400, headers: { 'Content-Type': 'application/json' } });
+				} finally {
+					await browser?.close();
+				}
 			}
 			return new Response(`Site: ${source}, Barcode: ${barcode}`, { status: 200 });
 		} else {
