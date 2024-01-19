@@ -35,7 +35,7 @@ export default {
 				// This code waits for a specific webpage element to load within 5 seconds, then retrieves and stores its URL.
 				const searchResultSelector =
 					'#__next > div > form > div.search_search_content_wrap__Ab4ZA.container > div.row.pt-4.pb-1 > div > div > a';
-				await page.waitForSelector(searchResultSelector, { timeout: 5000 });
+				await page.waitForSelector(searchResultSelector, { timeout: 3000 });
 				href = await page.$eval(searchResultSelector, (elm) => elm.href);
 
 				/* const href = await vendorPrice.cenoteka(barcode); */
